@@ -3,7 +3,6 @@ package com.example.inventory.config;
 import com.example.inventory.entity.*;
 import com.example.inventory.repository.*;
 import org.springframework.boot.CommandLineRunner;
-import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.stereotype.Component;
 
 import java.time.LocalDate;
@@ -18,7 +17,6 @@ public class DataInitializer implements CommandLineRunner {
     private final OrderRepository orderRepository;
     private final PurchaseRepository purchaseRepository;
     private final AlertRepository alertRepository;
-    private final PasswordEncoder passwordEncoder;
     private final JdbcTemplate jdbcTemplate;
 
     public DataInitializer(
@@ -27,14 +25,12 @@ public class DataInitializer implements CommandLineRunner {
             OrderRepository orderRepository,
             PurchaseRepository purchaseRepository,
             AlertRepository alertRepository,
-            PasswordEncoder passwordEncoder,
             JdbcTemplate jdbcTemplate) {
         this.userRepository = userRepository;
         this.productRepository = productRepository;
         this.orderRepository = orderRepository;
         this.purchaseRepository = purchaseRepository;
         this.alertRepository = alertRepository;
-        this.passwordEncoder = passwordEncoder;
         this.jdbcTemplate = jdbcTemplate;
     }
 
