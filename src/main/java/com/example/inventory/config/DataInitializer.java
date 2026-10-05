@@ -7,6 +7,8 @@ import org.springframework.stereotype.Component;
 
 import java.time.LocalDate;
 import java.time.LocalDateTime;
+import java.util.ArrayList;
+import java.util.List;
 import org.springframework.jdbc.core.JdbcTemplate;
 
 @Component
@@ -87,13 +89,43 @@ public class DataInitializer implements CommandLineRunner {
                 purchaseRepository.save(pur1);
             }
 
-            // Seed Alerts
-            if (alertRepository.count() == 0) {
-                Alert a1 = new Alert("LOW_STOCK", "Ultra HD 4K Monitor 27-inch is running low on stock (3 remaining)", "ACTIVE");
-                Alert a2 = new Alert("OUT_OF_STOCK", "USB-C Fast Charging Cable is completely out of stock", "CRITICAL");
-                alertRepository.save(a1);
-                alertRepository.save(a2);
+        }
+
+        // Create persisted alerts from the current inventory, even when products
+        // already existed before this application started.
+        if (alertRepository.count() == 0) {
+            List<Alert> initialAlerts = new ArrayList<>();
+
+            for (Product product : productRepository.findAll()) {
+                if (product.getQuantity() == 0) {
+                    initialAlerts.add(new Alert(
+                            "OUT_OF_STOCK",
+                            product.getName() + " is completely out of stock.",
+                            "CRITICAL"));
+                } else if (product.getQuantity() <= 5) {
+                    initialAlerts.add(new Alert(
+                            "LOW_STOCK",
+                            product.getName() + " is down to " + product.getQuantity() + " units.",
+                            "ACTIVE"));
+                }
             }
+
+            for (Purchase purchase : purchaseRepository.findAll()) {
+                if ("PENDING".equalsIgnoreCase(purchase.getStatus())) {
+                    String productName = purchase.getProductId() == null
+                            ? "Product"
+                            : productRepository.findById(purchase.getProductId())
+                                    .map(Product::getName)
+                                    .orElse("Product");
+                    initialAlerts.add(new Alert(
+                            "ORDER",
+                            "Order #" + purchase.getId() + " for " + productName
+                                    + " from " + purchase.getSupplier() + " is pending.",
+                            "ACTIVE"));
+                }
+            }
+
+            alertRepository.saveAll(initialAlerts);
         }
     }
 }
