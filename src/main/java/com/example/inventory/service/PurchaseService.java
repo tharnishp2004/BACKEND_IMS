@@ -7,6 +7,7 @@ import com.example.inventory.repository.PurchaseRepository;
 import org.springframework.stereotype.Service;
 
 import java.time.LocalDateTime;
+import java.time.ZoneOffset;
 import java.util.List;
 
 @Service
@@ -56,7 +57,7 @@ public class PurchaseService {
         productRepository.save(product);
 
         if (purchase.getDate() == null) {
-            purchase.setDate(LocalDateTime.now());
+            purchase.setDate(LocalDateTime.now(ZoneOffset.UTC));
         }
 
         if (purchase.getStatus() == null ||

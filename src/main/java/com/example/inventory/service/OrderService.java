@@ -7,6 +7,7 @@ import com.example.inventory.repository.ProductRepository;
 import org.springframework.stereotype.Service;
 
 import java.time.LocalDateTime;
+import java.time.ZoneOffset;
 import java.util.List;
 
 @Service
@@ -60,7 +61,7 @@ public class OrderService {
         productRepository.save(product);
 
         if (order.getDate() == null) {
-            order.setDate(LocalDateTime.now());
+            order.setDate(LocalDateTime.now(ZoneOffset.UTC));
         }
 
         if (order.getOrderStatus() == null ||
