@@ -58,8 +58,8 @@ public class DataInitializer implements CommandLineRunner {
         }
 
         // No default users are seeded.
-        // The very first user who registers via /api/auth/register
-        // is automatically assigned the ADMIN role.
+        // All new accounts register as VIEWER (Guest Viewer).
+        // Roles can be changed later via Admin → Users panel.
 
         // Seed Products if empty
         if (productRepository.count() == 0) {

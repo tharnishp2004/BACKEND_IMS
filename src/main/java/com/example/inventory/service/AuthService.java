@@ -26,14 +26,14 @@ public class AuthService {
             throw new RuntimeException("Username already exists");
         }
 
-        // Every registered user starts as ADMIN.
+        // All new accounts start as Guest Viewer.
         // Roles can be changed later via the Admin → Users panel.
         User user = new User();
 
         user.setName(request.getName());
         user.setUsername(request.getUsername());
         user.setPassword(encoder.encode(request.getPassword()));
-        user.setRole("ADMIN");
+        user.setRole("VIEWER");
 
         return userRepository.save(user);
     }
