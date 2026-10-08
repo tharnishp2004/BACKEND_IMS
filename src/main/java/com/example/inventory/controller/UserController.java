@@ -39,6 +39,9 @@ public class UserController {
     @PostMapping
     public User createUser(@RequestBody User user) {
         if (user.getPassword() != null && !user.getPassword().startsWith("$2a$")) {
+            if (user.getPassword().length() > 10) {
+                throw new RuntimeException("Password must be 10 characters or less.");
+            }
             user.setPassword(passwordEncoder.encode(user.getPassword()));
         }
         if (user.getRole() != null) {
@@ -57,6 +60,9 @@ public class UserController {
         if (user.getUsername() != null) existingUser.setUsername(user.getUsername());
         if (user.getPassword() != null && !user.getPassword().isBlank()) {
             if (!user.getPassword().startsWith("$2a$")) {
+                if (user.getPassword().length() > 10) {
+                    throw new RuntimeException("Password must be 10 characters or less.");
+                }
                 existingUser.setPassword(passwordEncoder.encode(user.getPassword()));
             } else {
                 existingUser.setPassword(user.getPassword());

@@ -1,5 +1,8 @@
 # run.ps1 - Smart backend starter: kills any process on port 8080, then starts Spring Boot
 
+# Ensure the working directory is always this folder (inventory)
+Set-Location $PSScriptRoot
+
 Write-Host "Checking port 8080..." -ForegroundColor Cyan
 
 $existing = Get-NetTCPConnection -LocalPort 8080 -State Listen -ErrorAction SilentlyContinue
@@ -13,4 +16,5 @@ if ($existing) {
 }
 
 Write-Host "Starting Spring Boot..." -ForegroundColor Cyan
-.\mvnw.cmd spring-boot:run
+& "$PSScriptRoot\mvnw.cmd" spring-boot:run
+

@@ -5,6 +5,7 @@ import com.example.inventory.dto.LoginResponse;
 import com.example.inventory.dto.RegisterRequest;
 import com.example.inventory.entity.User;
 import com.example.inventory.repository.UserRepository;
+import com.example.inventory.security.JwtService;
 import org.springframework.security.crypto.bcrypt.BCryptPasswordEncoder;
 import org.springframework.stereotype.Service;
 
@@ -12,12 +13,14 @@ import org.springframework.stereotype.Service;
 public class AuthService {
 
     private final UserRepository userRepository;
+    private final JwtService jwtService;
 
     private final BCryptPasswordEncoder encoder =
             new BCryptPasswordEncoder();
 
-    public AuthService(UserRepository userRepository) {
+    public AuthService(UserRepository userRepository, JwtService jwtService) {
         this.userRepository = userRepository;
+        this.jwtService = jwtService;
     }
 
     public User register(RegisterRequest request) {
@@ -26,7 +29,11 @@ public class AuthService {
             throw new RuntimeException("Username already exists");
         }
 
-        // All new accounts start as Guest Viewer.
+        if (request.getPassword() != null && request.getPassword().length() > 10) {
+            throw new RuntimeException("Password must be 10 characters or less.");
+        }
+
+        // All new accounts start as VIEWER (Guest Viewer).
         // Roles can be changed later via the Admin → Users panel.
         User user = new User();
 
@@ -52,8 +59,11 @@ public class AuthService {
             throw new RuntimeException("Invalid username or password");
         }
 
+        String token = jwtService.generateToken(user.getUsername(), user.getRole());
+
         return new LoginResponse(
                 "Login successful",
+                token,
                 user.getId(),
                 user.getName(),
                 user.getUsername(),
